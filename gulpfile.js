@@ -10,8 +10,8 @@ gulp.task('default', function() {
 
 gulp.task('build', ['sass'], function() {
    return gulp.src("./app/init.js")
-       .pipe(babel({ presets: ["es2015"] }))
        .pipe(rollup())
+       .pipe(babel({ presets: ["es2015"] }))
        .pipe(gulp.dest("build"))
 });
 
