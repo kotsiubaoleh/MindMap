@@ -1,4 +1,4 @@
-let appName  = "module.direcrives";
+let appName  = "module.directives";
 
 let module = angular.module(appName, []);
 

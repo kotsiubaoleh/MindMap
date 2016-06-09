@@ -1,4 +1,4 @@
-export default function() {
+export default function($window) {
 
         return {
             link: function (scope, element) {
@@ -19,8 +19,9 @@ export default function() {
 
                 var vis = d3.select(element[0]).append("svg:svg")
                     .attr("width", w + m[1] + m[3])
-                    .attr("height", h + m[0] + m[2])
-                    .append("svg:g")
+                    .attr("height", h + m[0] + m[2]);
+
+                vis.append("svg:g")
                     .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
                 // Toggle children.
@@ -41,6 +42,11 @@ export default function() {
                     }
                 }
 
+                // $window.onresize = function () {
+                //     console.log(element[0].clientWidth + " " +  element[0].clientHeight);
+                //     vis.attr("width", element[0].clientWidth)
+                //         .attr("height", element[0].clientHeight);
+                // }
 
                 scope.$watch('json', function () {
                     if (!(scope.json != null)) {
@@ -281,7 +287,6 @@ export default function() {
                         d.parent.children.forEach(function (c, index) {
                             if (thisId === c.id) {
                                 d.parent.children.splice(index, 1);
-                                return;
                             }
                         });
                         update(d.parent);
