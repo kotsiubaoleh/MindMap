@@ -1,6 +1,7 @@
 export default function($window) {
 
         return {
+
             link: function (scope, element) {
 
                 var eleW = element[0].clientWidth,
@@ -19,9 +20,8 @@ export default function($window) {
 
                 var vis = d3.select(element[0]).append("svg:svg")
                     .attr("width", w + m[1] + m[3])
-                    .attr("height", h + m[0] + m[2]);
-
-                vis.append("svg:g")
+                    .attr("height", h + m[0] + m[2])
+                    .append("svg:g")
                     .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
                 // Toggle children.
@@ -41,6 +41,20 @@ export default function($window) {
                         toggle(d);
                     }
                 }
+
+                function showSideMenu() {
+                    console.log(scope.isMenuVisible);
+                    scope.isMenuVisible = true;
+                    scope.$apply();
+                }
+
+                function selectNode(d) {
+                    showSideMenu();
+                }
+
+                scope.$watch('isMenuVisible',function () {
+
+                });
 
                 // $window.onresize = function () {
                 //     console.log(element[0].clientWidth + " " +  element[0].clientHeight);
@@ -181,7 +195,8 @@ export default function($window) {
                         })
                         .classed("toggleCircle", true)
                         .on("click", function (d) {
-                            toggle(d);
+                            //toggle(d);
+                            selectNode();
                             update(d);
                         });
 

@@ -8,6 +8,11 @@
     <body ng-app="mindMapApp">
 
     <div ng-controller="mindMapCtrl" class="minMapWrap">
+        <div class="sidemenu" ng-show="isMenuVisible">
+            <input type="text"></text>
+            <input type="text"></text>
+            <div class="btn">Delete</div>
+        </div>
         <div class="menu">
             <div class="btn btn-default" ng-click="new()">Clear</div>
             <div class="btn btn-default loadFile">
