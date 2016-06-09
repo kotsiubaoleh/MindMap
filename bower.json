@@ -1,0 +1,22 @@
+{
+  "name": "project",
+  "description": "",
+  "main": "api/server.js",
+  "authors": [
+    "Kotsiuba Oleh <kotsiubaoleh@gmail.com>"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/kotsiubaoleh/MindMap",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "4",
+    "angular": "^1.5.6",
+    "mind-map": "https://github.com/mofas/mindMap.git"
+  }
+}
