@@ -8,8 +8,8 @@ gulp.task('default', function() {
     // place code for your default task here
 });
 
-gulp.task('build', ['sass'], function() {
-   return gulp.src("./app/init.js")
+gulp.task('build', function() {
+   return gulp.src("./app/init.js", {})
        .pipe(rollup())
        .pipe(babel({ presets: ["es2015"] }))
        .pipe(gulp.dest("build"))
@@ -19,4 +19,9 @@ gulp.task('sass', function() {
    return gulp.src("./assets/scss/*.scss")
        .pipe(sass())
        .pipe(gulp.dest("./assets/css"))
+});
+
+gulp.task('watch', function() {
+   gulp.watch("./app/init.js", ['build']);
+   gulp.watch("./assets/scss/*.scss", ['sass']);
 });

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+        <link rel="stylesheet" href="bower_components/mind-map/app/styles/main.css">
+        <link rel="stylesheet" href="/assets/css/styles.css">
+
+    </head>
+    <body ng-app="mindMapApp">
+
+    <div ng-controller="mindMapCtrl" class="minMapWrap">
+        <div class="menu">
+            <div class="btn btn-default" ng-click="new()">新畫布</div>
+            <div class="btn btn-default loadFile">
+                <span>讀檔</span>
+                <input id="uploadFile" name="uploadFile" type="file" change-file="load">
+            </div>
+
+            <div class="downloadWrap">
+                <input class="fileName" type="text" ng-model="fileName">
+                <div class="btn btn-default" ng-click="save()">存檔</div>
+                <div id="downloadLinkWrap"></div>
+            </div>
+
+        </div>
+        <div class="mindMap" mind-map="root"></div>
+    </div>
+
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/d3/d3.js"></script>
+    <script src="build/init.js"></script>
+
+    </body>
+</html>

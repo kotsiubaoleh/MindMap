@@ -1,12 +1,13 @@
 var path = require('path');
-var data = require('../db/data.js')
+var data = require('../db/data.json')
 
 var express = require('express');
 var app = express();
 
 
-app.use(express.static('assets/css'));
-app.use(express.static('build'));
+app.use('/assets/css', express.static(path.join(__dirname, '../assets/css')));
+app.use('/build',express.static(path.join(__dirname, '../build')));
+app.use('/bower_components', express.static(path.join(__dirname,'../bower_components')));
 
 app.get('/data', function(req, res) {
    res.send(data);
@@ -19,3 +20,4 @@ app.get('/', function(req, res) {
 app.listen(3000);
 
 console.log("Server started!");
+console.log(path.join(__dirname, '../build'));
