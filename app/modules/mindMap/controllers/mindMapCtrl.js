@@ -2,6 +2,7 @@ export default function ($scope) {
     $scope.root = null;
     $scope.fileName = "mindMap";
     $scope.isMenuVisible = false;
+    $scope.selectedNode = {name:""};
 
     d3.json("db/data.json", function(json) {
         $scope.json = json;

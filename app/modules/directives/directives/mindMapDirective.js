@@ -18,11 +18,14 @@ export default function($window) {
                     return [d.y, d.x];
                 });
 
-                var vis = d3.select(element[0]).append("svg:svg")
+                var canvas = d3.select(element[0]).append("svg:svg")
                     .attr("width", w + m[1] + m[3])
                     .attr("height", h + m[0] + m[2])
-                    .append("svg:g")
+
+                var vis = canvas.append("svg:g")
                     .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+
+
 
                 // Toggle children.
                 function toggle(d) {
@@ -43,24 +46,25 @@ export default function($window) {
                 }
 
                 function showSideMenu() {
-                    console.log(scope.isMenuVisible);
                     scope.isMenuVisible = true;
-                    scope.$apply();
+
                 }
 
                 function selectNode(d) {
+                    console.dir(d);
                     showSideMenu();
+                    scope.selectedNode = d;
+                    scope.$apply();
                 }
 
-                scope.$watch('isMenuVisible',function () {
 
-                });
-
-                // $window.onresize = function () {
-                //     console.log(element[0].clientWidth + " " +  element[0].clientHeight);
-                //     vis.attr("width", element[0].clientWidth)
-                //         .attr("height", element[0].clientHeight);
-                // }
+                 $window.onresize = function () {
+                     w = element[0].clientWidth - m[1] - m[3];
+                     h = element[0].clientHeight - m[1] - m[3];
+                     canvas.attr("width", element[0].clientWidth)
+                         .attr("height", element[0].clientHeight);
+                     update(root, 100);
+                 };
 
                 scope.$watch('json', function () {
                     if (!(scope.json != null)) {
@@ -75,9 +79,17 @@ export default function($window) {
                     scope.root = root;
                 });
 
+                scope.$watch('selectedNode.name', function () {
+                    if (!(scope.selectedNode.name != null)) {
+                        scope.selectedNode = {
+                            "name": ""
+                        }
+                    }
+                    update(root);
+                })
 
-                function update(source) {
-                    var duration = 500;
+
+                function update(source, duration = 500) {
                     if (!(source != null)) {
                         return;
                     }
@@ -196,7 +208,7 @@ export default function($window) {
                         .classed("toggleCircle", true)
                         .on("click", function (d) {
                             //toggle(d);
-                            selectNode();
+                            selectNode(d);
                             update(d);
                         });
 
