@@ -9,20 +9,19 @@
 
     <div ng-controller="mindMapCtrl" class="minMapWrap">
         <div class="sidemenu" ng-show="isMenuVisible">
-            <input type="text"></text>
-            <input type="text"></text>
-            <div class="btn">Delete</div>
+            <input type="text" class="form-control"></text>
+            <button class="btn btn-danger">Delete</button>
         </div>
         <div class="menu">
-            <div class="btn btn-default" ng-click="new()">Clear</div>
-            <div class="btn btn-default loadFile">
+            <button class="btn btn-danger" ng-click="new()">Clear</button>
+            <div class="btn btn-info loadFile">
                 <span>Upload</span>
                 <input id="uploadFile" name="uploadFile" type="file" change-file="load">
             </div>
 
             <div class="downloadWrap">
                 <input class="fileName" type="text" ng-model="fileName">
-                <div class="btn btn-default" ng-click="save()">Save</div>
+                <button class="btn btn-info" ng-click="save()">Save</button>
                 <div id="downloadLinkWrap"></div>
             </div>
 

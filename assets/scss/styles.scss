@@ -56,7 +56,8 @@ body{
 }
 .sidemenu {
   height: 100%;
-  width:255px;
+  width:300px;
+  padding: 0 20px;
   position: fixed;
   z-index: 100;
   top: 0;
@@ -73,7 +74,7 @@ body{
 
 .sidemenu {
   input {
-    margin: 20px;
+    margin-bottom: 20px;
     text-decoration: none;
     font-size: 25px;
     color: #818181;
