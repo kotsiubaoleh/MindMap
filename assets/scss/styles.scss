@@ -63,15 +63,15 @@ body{
   top: 0;
   right: 0;
   overflow-x: hidden;
-  transition: 0.5s;
+  transition: all 0.5s linear 0s;
   background-color: #edf2f4;
   border: solid 1px silver;
   box-shadow: 0px 0px 2px 0px darkgray;
   padding: 20px;
 }
 
-.sideMenu.ng-hide {
-  width:0px;
+.sideMenu.hidden {
+  transform: translateX(100%);
 }
 
 
@@ -105,30 +105,14 @@ line {
     stroke: steelblue;
     stroke-width: 1.5px;
   }
+
+  circle.selected {
+    stroke: #17df7d;
+    transform: scale(1.5);
+  }
 }
 .link {
   fill: none;
   stroke: #ccc;
   stroke-width: 1.5px;
-}
-.function-btn{
-  opacity: 0;
-  -webkit-transition: all 0.5s ease;
-  -moz-transition: all 0.5s ease;
-  transition: all 0.5s ease;
-}
-.function-btn.add{
-  fill: #57D37E;
-}
-.function-btn.remove{
-  fill: #E97979;
-}
-.function-btn.edit{
-  fill: #79AFE9;
-}
-g:hover > .function-btn{
-  opacity: 1;
-}
-.function-bg{
-  cursor: pointer;
 }

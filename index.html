@@ -6,12 +6,7 @@
         <link rel="stylesheet" href="/assets/css/styles.css">
     </head>
     <body ng-app="mindMapApp">
-
     <div ng-controller="mindMapCtrl" class="minMapWrap">
-            <div class="sideMenu" ng-show="isMenuVisible">
-                <input type="text" class="form-control" ng-model="selectedNode.name"></text>
-                <button class="btn btn-danger">Delete</button>
-            </div>
         <div class="menu">
             <button class="btn btn-danger" ng-click="new()">Clear</button>
             <div class="btn btn-info loadFile">
@@ -26,7 +21,7 @@
             </div>
 
         </div>
-        <div class="mindMap" mind-map="root"></div>
+        <mind-map class="mindMap" root="json"></mind-map>
     </div>
 
     <script src="bower_components/angular/angular.js"></script>

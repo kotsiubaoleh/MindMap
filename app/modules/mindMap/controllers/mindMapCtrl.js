@@ -1,5 +1,4 @@
 export default function ($scope) {
-    $scope.root = null;
     $scope.fileName = "mindMap";
     $scope.isMenuVisible = false;
     $scope.selectedNode = {name:""};
@@ -43,7 +42,7 @@ export default function ($scope) {
     }
 
     $scope.save = function(){
-        var saveData = serializeData($scope.root);
+        var saveData = serializeData($scope.json);
         // window.open("data:text/json;charset=utf-8," + escape(JSON.stringify(saveData)));
         var MIME_TYPE = 'application/json';
         var bb = new Blob([JSON.stringify(saveData)], {type: MIME_TYPE});
