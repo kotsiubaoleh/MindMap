@@ -63,7 +63,7 @@ export default function($window) {
                         h = element[0].clientHeight - m[1] - m[3];
                         canvas.attr("width", element[0].clientWidth)
                             .attr("height", element[0].clientHeight);
-                        update(scope.root, 500);
+                        update(scope.root, 0);
                 }
 
                 function showSideMenu() {
@@ -82,10 +82,10 @@ export default function($window) {
                     if (selectedElement != null) {
                         d3.select(selectedElement).classed("selected",false);
                     }
-                    showSideMenu();
                     scope.selectedNode = d;
                     selectedElement = this;
                     d3.select(selectedElement).classed("selected",true);
+                    showSideMenu();
                     scope.$apply();
                 }
 
@@ -118,7 +118,7 @@ export default function($window) {
                     });
                     update(d);
                     //scope.root = root;
-                }
+                };
 
                 scope.removeNode = function (d) {
                     var thisId = d.id;
@@ -133,7 +133,7 @@ export default function($window) {
                     });
                     update(d.parent);
                     //scope.root = root;
-                }
+                };
 
 
                  $window.onresize = function () {
@@ -154,12 +154,7 @@ export default function($window) {
                 });
 
                 scope.$watch('selectedNode.name', function () {
-                    if (!(scope.selectedNode.name != null)) {
-                        scope.selectedNode = {
-                            "name": ""
-                        }
-                    }
-                    update(scope.root);
+                    update(scope.selectedNode,0);
                 });
 
 
@@ -283,7 +278,7 @@ export default function($window) {
                         .on("click", function (d) {
                             //toggle(d);
                             selectNode.call(this,d);
-                            update(d);
+                            //update(d);
                         });
 
                     nodeEnter.append("svg:text")
