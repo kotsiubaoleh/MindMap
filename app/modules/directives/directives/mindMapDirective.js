@@ -9,15 +9,21 @@ export default function($window) {
 
             templateUrl: "./app/views/mindMap.html",
 
-            link: function (scope, element) {
+            link: function (scope, element, attrs) {
+                var editable = "editable" in attrs;
+
                 scope.selectedNode = {};
+
+                var input = element.find("input");
+
                 var selectedElement  = null;
 
                 var isMenuVisible = false;
-                var sideMenu = element[0].querySelector(".sideMenu");
 
-                var eleW = element[0].clientWidth,
-                    eleH = element[0].clientHeight;
+                var sideMenu = element.children(".sideMenu");
+
+                var eleW = element.prop("clientWidth"),
+                    eleH = element.prop("clientHeight");
 
                 var m = [20, 40, 20, 80],
                     w = eleW - m[1] - m[3],
@@ -32,9 +38,10 @@ export default function($window) {
                 var canvas = d3.select(element[0]).append("svg:svg")
                     .attr("width", w + m[1] + m[3])
                     .attr("height", h + m[0] + m[2])
-                    .on("click", clearSelection);
-
-
+                    .on("click", function() {
+                        if (d3.event.target.nodeName != "svg" ) return;
+                        clearSelection();
+                    });
 
                 var vis = canvas.append("svg:g")
                     .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
@@ -58,44 +65,46 @@ export default function($window) {
                 }
                 
                 function updateDimensions() {
-                        w = element[0].clientWidth - m[1] - m[3]
-                            - (isMenuVisible?sideMenu.clientWidth:0);
-                        h = element[0].clientHeight - m[1] - m[3];
-                        canvas.attr("width", element[0].clientWidth)
-                            .attr("height", element[0].clientHeight);
-                        update(scope.root, 0);
+                    w = element.prop('clientWidth') - m[1] - m[3]
+                        - (isMenuVisible?sideMenu.prop("clientWidth"):0);
+                    h = element.prop('clientHeight') - m[1] - m[3];
+                    canvas.attr("width", element.prop("clientWidth"))
+                        .attr("height", element.prop("clientWidth"));
+                    update(scope.root, 300);
                 }
 
                 function showSideMenu() {
-                    d3.select(sideMenu).classed("hidden",false);
+                    sideMenu.removeClass("hidden");
                     isMenuVisible = true;
                     updateDimensions();
                 }
 
                 function hideSideMenu() {
-                    d3.select(sideMenu).classed("hidden",true);
+                    sideMenu.addClass("hidden");
                     isMenuVisible = false;
                     updateDimensions();
                 }
 
                 function selectNode(d) {
                     if (selectedElement != null) {
-                        d3.select(selectedElement).classed("selected",false);
+                        selectedElement.select("circle").classed("selected", false);
                     }
-                    scope.selectedNode = d;
-                    selectedElement = this;
-                    d3.select(selectedElement).classed("selected",true);
+                    
+                    selectedElement = d3.select(this);
+                    selectedElement.select("circle").classed("selected",true);
                     showSideMenu();
-                    scope.$apply();
+                    input[0].focus();
+                    scope.$apply(function () {
+                        scope.selectedNode = d;
+                    });
                 }
 
                 function clearSelection() {
-                    if (d3.event.target.nodeName == "circle") return;
                     if (selectedElement != null) {
-                        d3.select(selectedElement).classed("selected",false);
+                        selectedElement.select("circle").classed("selected", false);
+                        hideSideMenu();
+                        input[0].blur();
                     }
-                    hideSideMenu();
-                    scope.$apply();
                 }
 
                 scope.addNewNode= function (d) {
@@ -132,13 +141,13 @@ export default function($window) {
                         }
                     });
                     update(d.parent);
+                    clearSelection();
                     //scope.root = root;
                 };
 
-
-                 $window.onresize = function () {
-                     updateDimensions();
-                 };
+                $window.onresize = function () {
+                    updateDimensions();
+                };
 
                 scope.$watch('root', function () {
                     if (!(scope.json != null)) {
@@ -154,11 +163,32 @@ export default function($window) {
                 });
 
                 scope.$watch('selectedNode.name', function () {
-                    update(scope.selectedNode,0);
+                    //update(scope.selectedNode,0);
+                    updateSelectedText();
                 });
 
+                function updateSelectedText(d) {
+                    if (selectedElement != null) {
+                        var textNode = selectedElement.select("g.container").select("text");
+                        textNode.text(scope.selectedNode.name);
+                        textNode.property("textContent", scope.selectedNode.name);
+                        var textWidth = textNode.node().getBBox().width;
+
+                        if (!editable) {
+                            var checkboxContainer = selectedElement.select("g.checkbox");
+
+                            var checkboxWidth = checkboxContainer.select("rect").attr("width");
+
+                            var side = textNode.attr("text-anchor") === "start" ? 1 : -1;
+                            var checkboxOffset = side * (textWidth + checkboxWidth * (side === -1 ? 2 : 1));
+
+                            checkboxContainer.attr("transform", "translate(" + checkboxOffset + " -8)");
+                        }
+                    }
+                 }
 
                 function update(source, duration = 500) {
+
                     if (!(source != null)) {
                         return;
                     }
@@ -192,6 +222,18 @@ export default function($window) {
                         .attr("transform", function (d) {
                             return "translate(" + source.y0 + "," + source.x0 + ")";
                         });
+
+                    if (editable) {
+                        nodeEnter.on("click", function (d) {
+                            selectNode.call(this, d);
+                        });
+                    } else {
+                        nodeEnter.on("click", function (d) {
+                            d.checked = !d.checked;
+                            d3.select(this).select("g.checkbox").classed("checked", d.checked);
+                        });
+                    }
+
 
                     //inject content to node
                     InjectNodeContent(nodeEnter);
@@ -269,19 +311,19 @@ export default function($window) {
 
 
                 function InjectNodeContent(nodeEnter) {
-                    nodeEnter.append("svg:circle")
+
+                    var innerContainer = nodeEnter.append("svg:g")
+                        .attr("class", "container");
+
+                    innerContainer.append("svg:circle")
                         .attr("r", 1e-6)
                         .style("fill", function (d) {
                             return d._children ? "lightsteelblue" : "#fff";
                         })
-                        .classed("toggleCircle", true)
-                        .on("click", function (d) {
-                            //toggle(d);
-                            selectNode.call(this,d);
-                            //update(d);
-                        });
+                        .classed("toggleCircle", true);
 
-                    nodeEnter.append("svg:text")
+
+                    var textNodes = innerContainer.append("svg:text")
                         .attr("x", function (d) {
                             return d.children || d._children ? -10 : 10;
                         })
@@ -294,74 +336,35 @@ export default function($window) {
                         })
                         .style("fill-opacity", 1e-6);
 
-                    // // Add btn icon
-                    // nodeEnter.append("svg:path")
-                    //     .attr("d", "M12 24c-6.627 0-12-5.372-12-12s5.373-12 12-12c6.628 0 12 5.372 12 12s-5.372 12-12 12zM12 3c-4.97 0-9 4.030-9 9s4.030 9 9 9c4.971 0 9-4.030 9-9s-4.029-9-9-9zM13.5 18h-3v-4.5h-4.5v-3h4.5v-4.5h3v4.5h4.5v3h-4.5v4.5z")
-                    //     .attr("transform", function (d) {
-                    //         var offset = (d.children || d._children) ? -70 : 0;
-                    //         return "translate(" + offset + "," + 10 + ")";
-                    //     })
-                    //     .classed("function-btn add", true);
-                    //
-                    // nodeEnter.append("svg:rect")
-                    //     .classed("function-bg add", true)
-                    //     .attr("width", "24px")
-                    //     .attr("height", "24px")
-                    //     .attr("transform", function (d) {
-                    //         var offset = (d.children || d._children) ? -70 : 0;
-                    //         return "translate(" + offset + "," + 10 + ")";
-                    //     })
-                    //     .on("click", addNewNode);
-                    //
-                    // // Remove btn icon
-                    // nodeEnter.append("svg:path")
-                    //     .attr("d", "M3.514 20.485c-4.686-4.686-4.686-12.284 0-16.97 4.688-4.686 12.284-4.686 16.972 0 4.686 4.686 4.686 12.284 0 16.97-4.688 4.687-12.284 4.687-16.972 0zM18.365 5.636c-3.516-3.515-9.214-3.515-12.728 0-3.516 3.515-3.516 9.213 0 12.728 3.514 3.515 9.213 3.515 12.728 0 3.514-3.515 3.514-9.213 0-12.728zM8.818 17.303l-2.121-2.122 3.182-3.182-3.182-3.182 2.121-2.122 3.182 3.182 3.182-3.182 2.121 2.122-3.182 3.182 3.182 3.182-2.121 2.122-3.182-3.182-3.182 3.182z")
-                    //     .attr("transform", function (d) {
-                    //         var offset = (d.children || d._children) ? -40 : 30;
-                    //         return "translate(" + offset + "," + 10 + ")";
-                    //     })
-                    //     .classed("function-btn remove", true);
-                    //
-                    // nodeEnter.append("svg:rect")
-                    //     .classed("function-bg remove", true)
-                    //     .attr("width", "24px")
-                    //     .attr("height", "24px")
-                    //     .attr("transform", function (d) {
-                    //         var offset = (d.children || d._children) ? -40 : 30;
-                    //         return "translate(" + offset + "," + 10 + ")";
-                    //     })
-                    //     .on("click", removeNode);
-                    //
-                    // // Edit btn
-                    // nodeEnter.append("svg:path")
-                    //     .attr("d", "M20.307 1.998c-0.839-0.462-3.15-1.601-4.658-1.913-1.566-0.325-3.897 5.79-4.638 5.817-1.202 0.043-0.146-4.175 0.996-5.902-1.782 1.19-4.948 2.788-5.689 4.625-1.432 3.551 2.654 9.942 0.474 10.309-0.68 0.114-2.562-4.407-3.051-5.787-1.381 2.64-0.341 5.111 0.801 8.198v0.192c-0.044 0.167-0.082 0.327-0.121 0.489h0.121v4.48c0 0.825 0.668 1.493 1.493 1.493 0.825 0 1.493-0.668 1.493-1.493v-4.527c2.787-0.314 4.098 0.6 6.007-3.020-1.165 0.482-3.491-0.987-3.009-1.68 0.97-1.396 4.935 0.079 7.462-4.211-4 1.066-4.473-0.462-4.511-1.019-0.080-1.154 3.999-0.542 5.858-2.146 1.078-0.93 2.37-3.133 0.97-3.905z")
-                    //     .attr("transform", function (d) {
-                    //         var offset = (d.children || d._children) ? -10 : 60;
-                    //         return "translate(" + offset + "," + 10 + ")";
-                    //     })
-                    //     .classed("function-btn edit", true);
-                    //
-                    // nodeEnter.append("svg:rect")
-                    //     .classed("function-bg edit", true)
-                    //     .attr("width", "24px")
-                    //     .attr("height", "24px")
-                    //     .attr("transform", function (d) {
-                    //         var offset = (d.children || d._children) ? -10 : 60;
-                    //         return "translate(" + offset + "," + 10 + ")";
-                    //     })
-                    //     .on("click", editNode);
-                    //
-                    // function editNode(d) {
-                    //     var name = prompt("輸入新的名稱", d.name);
-                    //     if (name != null) {
-                    //         d.name = name;
-                    //     }
-                    //     if (!d.parent) {
-                    //         update(d);
-                    //     }
-                    //     update(d.parent);
-                    //     //scope.root = root;
-                    // }
+
+
+                    if (!editable) {
+                        var checkbox = nodeEnter.append("svg:g")
+                            .attr("class", "checkbox");
+
+                        checkbox.append("svg:rect")
+                            .attr("width", 15)
+                            .attr("height", 15);
+                        //.attr("y", "-.5em");
+
+                        checkbox.append("svg:path")
+                            .attr("d", "m0.184632,7.869125l5.520013,6.694498l8.926091,-12.147537l-8.590524,7.785162l-5.85558,-2.332122z");
+                        //.attr("d", "-.5em");
+
+                        checkbox.attr("transform", function (d, i) {
+                            //var textNode = textNodes.filter((d, ei) => ei === i);
+
+                            var textNode = d3.select(this.parentNode).select("text");
+
+                            var side = -1;  //The text is on the left side
+                            if (textNode.attr("text-anchor") === "start") side = 1; //The text is on the right side
+
+                            var offsetX = side * (textNode.node().getBBox().width
+                                + d3.select(this).select("rect").attr("width")
+                                * (side === -1 ? 2 : 1));
+                            return ("translate(" + offsetX + " -8)");
+                        });
+                    }
                 }
             }
         };

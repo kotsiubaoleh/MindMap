@@ -2,6 +2,7 @@ var gulp = require('gulp'),
     babel = require('gulp-babel'),
     rollup = require('gulp-rollup'),
     sass = require('gulp-sass'),
+    autoprefixer = require('gulp-autoprefixer')
     browserSync = require('browser-sync').create();
 
 
@@ -19,6 +20,7 @@ gulp.task('build', function() {
 gulp.task('sass', function() {
    return gulp.src("./assets/scss/*.scss")
        .pipe(sass())
+       .pipe(autoprefixer())
        .pipe(gulp.dest("./assets/css"))
 });
 

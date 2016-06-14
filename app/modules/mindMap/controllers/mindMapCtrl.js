@@ -11,6 +11,7 @@ export default function ($scope) {
     function serializeData(source){
         var json = {};
         json.name = source.name;
+        if (source.checked) json.checked = true;
         var children = source.children || source._children;
         var childList = [];
         if(children){
@@ -50,7 +51,7 @@ export default function ($scope) {
         var a = document.createElement('a');
         a.download = $scope.fileName + ".json";
         a.href = window.URL.createObjectURL(bb);
-        a.textContent = '點擊下載';
+        a.textContent = 'Download';
 
         a.dataset.downloadurl = [MIME_TYPE, a.download, a.href].join(':');
         document.querySelectorAll("#downloadLinkWrap")[0].innerHTML = "";

@@ -4,7 +4,7 @@ export default function(){
             changeFunction: '=changeFile'
         },
         link: function(scope, el, attrs){
-            el.bind('change', function(event){
+            el.on('change', function(event){
                 var files = event.target.files;
                 var file = files[0];
                 scope.changeFunction(file);
