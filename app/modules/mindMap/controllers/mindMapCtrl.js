@@ -1,16 +1,15 @@
-export default function ($scope) {
+export default function ($scope, $http) {
     $scope.fileName = "mindMap";
     $scope.isMenuVisible = false;
     $scope.selectedNode = {name:""};
 
-    d3.json("db/data.json", function(json) {
-        $scope.json = json;
-        $scope.$apply();
+    $http.get("/data").then(function(response) {
+        $scope.json = response.data;
     });
 
     function serializeData(source){
         var json = {};
-        json.name = source.name;
+        //json.name = source.name;
         if (source.checked) json.checked = true;
         var children = source.children || source._children;
         var childList = [];
@@ -56,5 +55,9 @@ export default function ($scope) {
         a.dataset.downloadurl = [MIME_TYPE, a.download, a.href].join(':');
         document.querySelectorAll("#downloadLinkWrap")[0].innerHTML = "";
         document.querySelectorAll("#downloadLinkWrap")[0].appendChild(a);
+    }
+
+    $scope.edit = function(node) {
+        console.log("Edited: " + node);
     }
 }

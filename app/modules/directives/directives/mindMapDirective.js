@@ -2,7 +2,8 @@ export default function($window) {
 
         return {
             scope: {
-                root: "="
+                root: "=",
+                edit: "&onEdit"
             },
             
             restrict: "E",
@@ -145,13 +146,17 @@ export default function($window) {
                     //scope.root = root;
                 };
 
+                scope.edit = function (d) {
+
+                }
+
                 $window.onresize = function () {
                     updateDimensions();
                 };
 
                 scope.$watch('root', function () {
-                    if (!(scope.json != null)) {
-                        scope.json = {
+                    if (!(scope.root != null)) {
+                        scope.root = {
                             "name": "root"
                         }
                     }

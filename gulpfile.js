@@ -25,13 +25,20 @@ gulp.task('sass', function() {
 });
 
 gulp.task('watch', function() {
+
+
+   gulp.watch("./app/**/*.js", ['build']);
+   gulp.watch("./assets/scss/*.scss", ['sass']);
+
+});
+
+gulp.task('serve', ["watch"], function () {
    browserSync.init( {
       server: './'
    });
 
-   gulp.watch("./app/**/*.js", ['build']);
-   gulp.watch("./assets/scss/*.scss", ['sass']);
    gulp.watch(["./assets/css/*", "./build/*", "./**/*.html"]).on('change', function () {
       browserSync.reload();
    })
-});
+
+})
