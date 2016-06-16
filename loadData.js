@@ -1,6 +1,6 @@
 var mongoose = require('mongoose'),
     materialized = require('mongoose-materialized'),
-    mindMapData = require('./db/testdata.json');
+    mindMapData = require('./db/data.json');
     Schema = mongoose.Schema;
 
 function getNodeNum(node) {

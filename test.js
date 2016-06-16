@@ -17,9 +17,9 @@ var Node = mongoose.model("Node", NodeSchema);
 //     })
 // });
 
-Node.GetFullTree(function(err, node) {
-   console.log(node);
-});
+// Node.GetFullTree(function(err, node) {
+//    console.log(node);
+// });
 
 // Node.findOne({name: 9},function (err, node) {
 //     if (err) console.error(err);
@@ -42,3 +42,14 @@ Node.GetFullTree(function(err, node) {
 // })
 
 //console.log(Node.count());
+
+Node.findOne({name: "Community"},function (err, node) {
+   console.log(node);
+   node.getChildren({limit: 300, fields: {_id:1}}, function (err, idsToDelete) {
+      if (err )console.log(err);
+      Node.remove({_id: {$in: idsToDelete}}, function (err, res) {
+         if (err )console.log(err);
+         console.log(res);
+      })
+   })
+})

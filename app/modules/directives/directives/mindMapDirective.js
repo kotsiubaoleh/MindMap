@@ -3,7 +3,9 @@ export default function($window) {
         return {
             scope: {
                 root: "=",
-                edit: "&onEdit"
+                save: "&onSave",
+                delete: "&onDelete",
+                insert: "&onInsert"
             },
             
             restrict: "E",
@@ -11,6 +13,11 @@ export default function($window) {
             templateUrl: "./app/views/mindMap.html",
 
             link: function (scope, element, attrs) {
+
+                //console.dir(scope.edit);
+                // scope.edit({edit:function () {
+                //     alert("Directive");
+                // }});
                 var editable = "editable" in attrs;
 
                 scope.selectedNode = {};
@@ -47,23 +54,6 @@ export default function($window) {
                 var vis = canvas.append("svg:g")
                     .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
-                // Toggle children.
-                function toggle(d) {
-                    if (d.children) {
-                        d._children = d.children;
-                        d.children = null;
-                    } else {
-                        d.children = d._children;
-                        d._children = null;
-                    }
-                }
-
-                function toggleAll(d) {
-                    if (d.children) {
-                        d.children.forEach(toggleAll);
-                        toggle(d);
-                    }
-                }
                 
                 function updateDimensions() {
                     w = element.prop('clientWidth') - m[1] - m[3]
@@ -108,47 +98,53 @@ export default function($window) {
                     }
                 }
 
-                scope.addNewNode= function (d) {
-                    var childList;
-                    if (d.children) {
-                        childList = d.children;
-                    }
-                    else if (d._children) {
-                        childList = d.children = d._children;
-                        d._children = null;
-                    }
-                    else {
-                        childList = [];
-                        d.children = childList;
-                    }
-                    childList.push({
+                scope.addNewNode = function (d) {
+
+                    var newNode = {
                         "depth": d.depth + 1,
                         "name": "new Node",
                         "parent": d
-                    });
-                    update(d);
-                    //scope.root = root;
+                    };
+                    scope.insert({node:newNode,
+                    success: function (id) {
+                        newNode._id = id;
+                        if (!d.children) d.children = [];
+                        d.children.push(newNode);
+                        update(d);
+                    }, fail: function () {
+                        //TODO: show notification
+                    }});
                 };
 
                 scope.removeNode = function (d) {
-                    var thisId = d.id;
                     if (!d.parent) {
                         alert("Cannot remove root");
                         return;
                     }
-                    d.parent.children.forEach(function (c, index) {
-                        if (thisId === c.id) {
-                            d.parent.children.splice(index, 1);
+                    scope.delete({node: scope.selectedNode,
+                        success: function () {
+                            var thisId = d.id;
+                            d.parent.children.forEach(function (c, index) {
+                                if (thisId === c.id) {
+                                    d.parent.children.splice(index, 1);
+                                }
+                            });
+                            update(d.parent);
+                            clearSelection();
+                        }, fail: function () {
+                            //TODO: show notification
                         }
-                    });
-                    update(d.parent);
-                    clearSelection();
-                    //scope.root = root;
+                    })
                 };
 
-                scope.edit = function (d) {
-
-                }
+                scope.onSave = function() {
+                    scope.save({node: scope.selectedNode,
+                    success: function () {
+                        //TODO: show notification
+                    }, fail: function () {
+                        //TODO: show notification
+                    }});
+                };
 
                 $window.onresize = function () {
                     updateDimensions();

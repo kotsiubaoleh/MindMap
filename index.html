@@ -6,21 +6,8 @@
     </head>
     <body ng-app="mindMapApp">
     <div ng-controller="mindMapCtrl" class="minMapWrap">
-        <div class="menu">
-            <button class="btn btn-danger" ng-click="new()">Clear</button>
-            <div class="btn btn-info loadFile">
-                <span>Upload</span>
-                <input id="uploadFile" name="uploadFile" type="file" change-file="load">
-            </div>
-
-            <div class="downloadWrap">
-                <input class="fileName" type="text" ng-model="fileName">
-                <button class="btn btn-info" ng-click="save()">Save</button>
-                <div id="downloadLinkWrap"></div>
-            </div>
-
-        </div>
-        <mind-map class="mindMap" root="json" on-edit="edit" editable></mind-map>
+        <mind-map class="mindMap" root="json" on-save="on-save(node, success, fail)"
+                  on-delete="on-delete(node, success, fail)" on-insert="on-insert(node, success, fail)" editable></mind-map>
     </div>
 
     <script src="bower_components/angular/angular.js"></script>
