@@ -18,6 +18,7 @@ export default function($window) {
                 // scope.edit({edit:function () {
                 //     alert("Directive");
                 // }});
+                
                 var editable = "editable" in attrs;
 
                 scope.selectedNode = {};
@@ -56,8 +57,8 @@ export default function($window) {
 
                 
                 function updateDimensions() {
-                    w = element.prop('clientWidth') - m[1] - m[3]
-                        - (isMenuVisible?sideMenu.prop("clientWidth"):0);
+                    w = element.prop('clientWidth') - m[1] - m[3];
+                        //- (isMenuVisible?sideMenu.prop("clientWidth"):0);
                     h = element.prop('clientHeight') - m[1] - m[3];
                     canvas.attr("width", element.prop("clientWidth"))
                         .attr("height", element.prop("clientWidth"));
@@ -65,13 +66,13 @@ export default function($window) {
                 }
 
                 function showSideMenu() {
-                    sideMenu.removeClass("hidden");
+                    sideMenu.removeClass("menuHidden");
                     isMenuVisible = true;
                     updateDimensions();
                 }
 
                 function hideSideMenu() {
-                    sideMenu.addClass("hidden");
+                    sideMenu.addClass("menuHidden");
                     isMenuVisible = false;
                     updateDimensions();
                 }
@@ -107,6 +108,7 @@ export default function($window) {
                     };
                     scope.insert({node:newNode,
                     success: function (id) {
+
                         newNode._id = id;
                         if (!d.children) d.children = [];
                         d.children.push(newNode);
@@ -240,8 +242,9 @@ export default function($window) {
                     InjectNodeContent(nodeEnter);
 
                     // Transition nodes to their new position.
-                    var nodeUpdate = node.transition()
-                        .duration(duration)
+                    var nodeUpdate = node
+                        //.transition()
+                        //.duration(duration)
                         .attr("transform", function (d) {
                             return "translate(" + d.y + "," + d.x + ")";
                         });
@@ -259,8 +262,9 @@ export default function($window) {
                         .style("fill-opacity", 1);
 
                     // Transition exiting nodes to the parent's new position.
-                    var nodeExit = node.exit().transition()
-                        .duration(duration)
+                    var nodeExit = node.exit()
+                        //.transition()
+                        //.duration(duration)
                         .attr("transform", function (d) {
                             return "translate(" + source.y + "," + source.x + ")";
                         })
@@ -285,18 +289,20 @@ export default function($window) {
                             var o = {x: source.x0, y: source.y0};
                             return diagonal({source: o, target: o});
                         })
-                        .transition()
-                        .duration(duration)
+                        //.transition()
+                        //.duration(duration)
                         .attr("d", diagonal);
 
                     // Transition links to their new position.
-                    link.transition()
-                        .duration(duration)
+                    link
+                        //.transition()
+                        //.duration(duration)
                         .attr("d", diagonal);
 
                     // Transition exiting nodes to the parent's new position.
-                    link.exit().transition()
-                        .duration(duration)
+                    link.exit()
+                        //.transition()
+                        //.duration(duration)
                         .attr("d", function (d) {
                             var o = {x: source.x, y: source.y};
                             return diagonal({source: o, target: o});

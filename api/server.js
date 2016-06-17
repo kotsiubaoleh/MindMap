@@ -32,13 +32,18 @@ app.use(bodyParser.json());
 
 
 app.put('/data', function (req, res, next) {
-    console.log(req.body.parentId);
     Node.findOne({_id: req.body.parentId}, function (err, parentNode) {
         if (err) {
             next(err);
             return;
+        } else if (!parentNode) {
+            var error = new Error("Node not find");
+            error.status = 404;
+            next(error);
+            return;
         }
         var newNode = new Node({name: req.body.name});
+
         parentNode.appendChild(newNode, function (err, node) {
             if (err) {
                 next(err);

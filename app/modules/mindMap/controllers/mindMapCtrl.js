@@ -30,8 +30,8 @@ export default function ($scope, $http) {
     $scope.insert = function(node, success, fail) {
         console.log(node.parent._id);
         $http.put("data/", {name: node.name, parentId: node.parent._id}).then(function (response) {
-            console.log(node.parent._id);
-            success(response.id);
+            console.log(response);
+            success(response.data.id);
             console.log("Insert success!");
         }, function (response) {
             fail();
