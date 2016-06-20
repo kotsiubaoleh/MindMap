@@ -7,7 +7,7 @@ export default function ($scope, $http) {
 
 
     $scope.save = function(node, success, fail) {
-        $http.post("data/" + node.id, {name: node.name}).then(function (response) {
+        $http.post("data/" + node._id, {name: node.name}).then(function (response) {
             success();
             console.log("Edit success!");
         }, function (response) {

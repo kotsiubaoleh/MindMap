@@ -55,14 +55,12 @@ export default function($window) {
                 var vis = canvas.append("svg:g")
                     .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
-                
                 function updateDimensions() {
-                    w = element.prop('clientWidth') - m[1] - m[3];
-                        //- (isMenuVisible?sideMenu.prop("clientWidth"):0);
+                    w = element.prop('clientWidth') - m[1] - m[3] - (isMenuVisible?sideMenu.prop("clientWidth"):0);
                     h = element.prop('clientHeight') - m[1] - m[3];
                     canvas.attr("width", element.prop("clientWidth"))
                         .attr("height", element.prop("clientWidth"));
-                    update(scope.root, 300);
+                    update(scope.root);
                 }
 
                 function showSideMenu() {
@@ -85,7 +83,7 @@ export default function($window) {
                     selectedElement = d3.select(this);
                     selectedElement.select("circle").classed("selected",true);
                     showSideMenu();
-                    input[0].focus();
+                    //input[0].focus();
                     scope.$apply(function () {
                         scope.selectedNode = d;
                     });
@@ -100,7 +98,6 @@ export default function($window) {
                 }
 
                 scope.addNewNode = function (d) {
-
                     var newNode = {
                         "depth": d.depth + 1,
                         "name": "new Node",
@@ -108,7 +105,6 @@ export default function($window) {
                     };
                     scope.insert({node:newNode,
                     success: function (id) {
-
                         newNode._id = id;
                         if (!d.children) d.children = [];
                         d.children.push(newNode);
@@ -166,7 +162,7 @@ export default function($window) {
                 });
 
                 scope.$watch('selectedNode.name', function () {
-                    //update(scope.selectedNode,0);
+                    update(scope.selectedNode,0);
                     updateSelectedText();
                 });
 
@@ -190,12 +186,13 @@ export default function($window) {
                     }
                  }
 
-                function update(source, duration = 500) {
+                function update(source) {
 
                     if (!(source != null)) {
                         return;
                     }
 
+                    var duration = 300;
                     // Compute the new tree layout.
 
                     var nodes = tree.nodes(scope.root).reverse();
@@ -243,8 +240,8 @@ export default function($window) {
 
                     // Transition nodes to their new position.
                     var nodeUpdate = node
-                        //.transition()
-                        //.duration(duration)
+                        .transition()
+                        .duration(duration)
                         .attr("transform", function (d) {
                             return "translate(" + d.y + "," + d.x + ")";
                         });
@@ -263,8 +260,8 @@ export default function($window) {
 
                     // Transition exiting nodes to the parent's new position.
                     var nodeExit = node.exit()
-                        //.transition()
-                        //.duration(duration)
+                        .transition()
+                        .duration(duration)
                         .attr("transform", function (d) {
                             return "translate(" + source.y + "," + source.x + ")";
                         })
@@ -289,20 +286,20 @@ export default function($window) {
                             var o = {x: source.x0, y: source.y0};
                             return diagonal({source: o, target: o});
                         })
-                        //.transition()
-                        //.duration(duration)
+                        .transition()
+                        .duration(duration)
                         .attr("d", diagonal);
 
                     // Transition links to their new position.
                     link
-                        //.transition()
-                        //.duration(duration)
+                        .transition()
+                        .duration(duration)
                         .attr("d", diagonal);
 
                     // Transition exiting nodes to the parent's new position.
                     link.exit()
-                        //.transition()
-                        //.duration(duration)
+                        .transition()
+                        .duration(duration)
                         .attr("d", function (d) {
                             var o = {x: source.x, y: source.y};
                             return diagonal({source: o, target: o});
