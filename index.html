@@ -12,19 +12,24 @@
     </div>
 
     <div class="authentication-bg">
-        <div class="login" ng-controller="authCtrl">
+        <div class="login" ng-controller="authenticationCtrl">
             <form>
                 <div class="form-group">
                     <label for="exampleInputEmail1">Login</label>
-                    <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Login" ng-model="login">
+                    <input type="text" class="form-control" id="exampleInputEmail1" placeholder="Login" ng-model="loginName">
                 </div>
                 <div class="form-group">
                     <label for="exampleInputPassword1">Password</label>
                     <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" ng-model="password">
                 </div>
-                <label><input type="checkbox" ng-model="newUser"/>New user</label>
-                {{ololo}}
-                <input type="submit" class="btn btn-primary" value="Login"/>
+                <div class="form-group" ng-show="newUser">
+                    <label for="exampleInputPassword1">Repeat password</label>
+                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" ng-model="passwordRep">
+                </div>
+                <div class="checkbox">
+                    <label><input type="checkbox" ng-model="newUser"/>New user</label>
+                </div>
+                <input type="submit" class="submitButton"  ng-value="newUser ? 'Register' : 'Login'" ng-click="login()"/>
             </form>
         </div>
     </div>

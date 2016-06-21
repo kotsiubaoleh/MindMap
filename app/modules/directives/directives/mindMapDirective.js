@@ -113,7 +113,7 @@ export default function($window) {
                         }
                     }
                 }
-
+                
                 scope.addNewNode = function () {
                     var newNode = {
                         "depth": selectedNode.depth + 1,

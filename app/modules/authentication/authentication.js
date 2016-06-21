@@ -1,6 +1,6 @@
 let appName = 'module.authentication';
 
-let module = angular.module(appName,[]);
+let module = angular.module(appName,['satellizer']);
 
 import authenticationCtrl from './controllers/authenticationCtrl.js';
 

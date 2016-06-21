@@ -118,6 +118,20 @@ body {
   }
 }
 
+input[type="checkbox"] {
+  margin: 10px
+}
+
+.submitButton {
+  display: block;
+  height: 40px;
+  width: 100%;
+  font-size: 1.2em;
+  background-color: #0074d9;
+  border-radius: 5px;
+  color: white;
+}
+
 
 
 
