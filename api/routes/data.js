@@ -12,6 +12,8 @@ router.get('/', function(req, res, next) {
     })
 });
 
+
+//Add new node
 router.put('/', function (req, res, next) {
     req.models.node.findOne({_id: req.body.parentId}, function (err, parentNode) {
         if (err) {
@@ -52,6 +54,7 @@ router.put('/', function (req, res, next) {
 //     })
 // });
 
+//Edit node
 router.post('/:id', function (req, res, next) {
     async.waterfall([
         function(callback) {
@@ -100,6 +103,8 @@ router.post('/:id', function (req, res, next) {
 //     })
 // });
 
+
+//Remove node
 router.delete('/:id', function (req, res, next) {
 
   async.waterfall([

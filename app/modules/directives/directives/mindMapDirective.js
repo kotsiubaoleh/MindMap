@@ -1,3 +1,5 @@
+'use strict';
+
 export default function($window) {
 
         return {
@@ -18,10 +20,10 @@ export default function($window) {
                 // scope.edit({edit:function () {
                 //     alert("Directive");
                 // }});
+
+                var selectedNode = {};
                 
                 var editable = "editable" in attrs;
-
-                scope.selectedNode = {};
 
                 var input = element.find("input");
 
@@ -31,33 +33,10 @@ export default function($window) {
 
                 var sideMenu = element.children(".sideMenu");
 
-                var eleW = element.prop("clientWidth"),
-                    eleH = element.prop("clientHeight");
-
-                var m = [20, 40, 20, 80],
-                    w = eleW - m[1] - m[3],
-                    h = eleH - m[0] - m[2],
-                    i = 0;
-
-                var tree = d3.layout.tree().size([h, w]);
-                var diagonal = d3.svg.diagonal().projection(function (d) {
-                    return [d.y, d.x];
-                });
-
-                var canvas = d3.select(element[0]).append("svg:svg")
-                    .attr("width", w + m[1] + m[3])
-                    .attr("height", h + m[0] + m[2])
-                    .on("click", function() {
-                        if (d3.event.target.nodeName != "svg" ) return;
-                        clearSelection();
-                    });
-
-                var vis = canvas.append("svg:g")
-                    .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
                 function updateDimensions() {
                     w = element.prop('clientWidth') - m[1] - m[3] - (isMenuVisible?sideMenu.prop("clientWidth"):0);
-                    h = element.prop('clientHeight') - m[1] - m[3];
+                    h = element.prop('clientHeight') - m[0] - m[2];
                     canvas.attr("width", element.prop("clientWidth"))
                         .attr("height", element.prop("clientWidth"));
                     update(scope.root);
@@ -75,59 +54,97 @@ export default function($window) {
                     updateDimensions();
                 }
 
-                function selectNode(d) {
+                function deselectNode() {
                     if (selectedElement != null) {
                         selectedElement.select("circle").classed("selected", false);
+                        selectedNode.name = selectedNode._name;
+                        checkNodeName();
                     }
+                }
+
+                function selectNode(d) {
+                    deselectNode();
+
+                    selectedNode = d;
+                    selectedNode._name = selectedNode.name;
                     
                     selectedElement = d3.select(this);
                     selectedElement.select("circle").classed("selected",true);
+
                     showSideMenu();
-                    //input[0].focus();
+
                     scope.$apply(function () {
-                        scope.selectedNode = d;
+                        scope.nodeName = d.name;
                     });
                 }
 
                 function clearSelection() {
-                    if (selectedElement != null) {
-                        selectedElement.select("circle").classed("selected", false);
-                        hideSideMenu();
-                        input[0].blur();
+                    deselectNode();
+                    update(scope.root);
+                    hideSideMenu();
+                }
+
+                function checkNodeName() {
+                    if (selectedElement) {
+                        var textNode = selectedElement.select("g.container").select("text");
+                        if (selectedNode.name != selectedNode._name) textNode.style("fill", "gray");
+                        else textNode.style("fill", "black");
                     }
                 }
 
-                scope.addNewNode = function (d) {
+                //updating selected node text without calling update method
+                function updateSelectedText() {
+                    if (selectedElement != null) {
+                        var textNode = selectedElement.select("g.container").select("text");
+                        textNode.text(scope.nodeName);
+                        selectedNode.name = scope.nodeName;
+
+                        var textWidth = textNode.node().getBBox().width;
+
+                        if (!editable) {
+                            var checkboxContainer = selectedElement.select("g.checkbox");
+
+                            var checkboxWidth = checkboxContainer.select("rect").attr("width");
+
+                            var side = textNode.attr("text-anchor") === "start" ? 1 : -1;
+                            var checkboxOffset = side * (textWidth + checkboxWidth * (side === -1 ? 2 : 1));
+
+                            checkboxContainer.attr("transform", "translate(" + checkboxOffset + " -8)");
+                        }
+                    }
+                }
+
+                scope.addNewNode = function () {
                     var newNode = {
-                        "depth": d.depth + 1,
+                        "depth": selectedNode.depth + 1,
                         "name": "new Node",
-                        "parent": d
+                        "parent": selectedNode
                     };
                     scope.insert({node:newNode,
                     success: function (id) {
                         newNode._id = id;
-                        if (!d.children) d.children = [];
-                        d.children.push(newNode);
-                        update(d);
+                        if (!selectedNode.children) selectedNode.children = [];
+                        selectedNode.children.push(newNode);
+                        update(selectedNode);
                     }, fail: function () {
                         //TODO: show notification
                     }});
                 };
 
-                scope.removeNode = function (d) {
-                    if (!d.parent) {
+                scope.removeNode = function () {
+                    if (!selectedNode.parent) {
                         alert("Cannot remove root");
                         return;
                     }
-                    scope.delete({node: scope.selectedNode,
+                    scope.delete({node: selectedNode,
                         success: function () {
-                            var thisId = d.id;
-                            d.parent.children.forEach(function (c, index) {
+                            var thisId = selectedNode.id;
+                            selectedNode.parent.children.forEach(function (c, index) {
                                 if (thisId === c.id) {
-                                    d.parent.children.splice(index, 1);
+                                    selectedNode.parent.children.splice(index, 1);
                                 }
                             });
-                            update(d.parent);
+                            update(selectedNode.parent);
                             clearSelection();
                         }, fail: function () {
                             //TODO: show notification
@@ -136,9 +153,10 @@ export default function($window) {
                 };
 
                 scope.onSave = function() {
-                    scope.save({node: scope.selectedNode,
+                    scope.save({node: selectedNode,
                     success: function () {
-                        //TODO: show notification
+                        selectedNode._name = scope.nodeName;
+                        checkNodeName();
                     }, fail: function () {
                         //TODO: show notification
                     }});
@@ -154,37 +172,46 @@ export default function($window) {
                             "name": "root"
                         }
                     }
-                    //scope.root = scope.json;
                     scope.root.x0 = h / 2;
                     scope.root.y0 = 0;
                     update(scope.root);
-                    //scope.root = root;
                 });
 
-                scope.$watch('selectedNode.name', function () {
-                    update(scope.selectedNode,0);
+                scope.$watch('nodeName', function () {
                     updateSelectedText();
+                    checkNodeName();
                 });
 
-                function updateSelectedText(d) {
-                    if (selectedElement != null) {
-                        var textNode = selectedElement.select("g.container").select("text");
-                        textNode.text(scope.selectedNode.name);
-                        textNode.property("textContent", scope.selectedNode.name);
-                        var textWidth = textNode.node().getBBox().width;
 
-                        if (!editable) {
-                            var checkboxContainer = selectedElement.select("g.checkbox");
 
-                            var checkboxWidth = checkboxContainer.select("rect").attr("width");
+                var eleW = element.prop("clientWidth"),
+                    eleH = element.prop("clientHeight");
 
-                            var side = textNode.attr("text-anchor") === "start" ? 1 : -1;
-                            var checkboxOffset = side * (textWidth + checkboxWidth * (side === -1 ? 2 : 1));
+                var m = [20, 40, 20, 80],
+                    w = eleW - m[1] - m[3],
+                    h = eleH - m[0] - m[2],
+                    i = 0;
 
-                            checkboxContainer.attr("transform", "translate(" + checkboxOffset + " -8)");
-                        }
-                    }
-                 }
+                var tree = d3.layout.tree().size([h, w]);
+
+                var diagonal = d3.svg.diagonal().projection(function (d) {
+                    return [d.y, d.x];
+                });
+
+                var canvas = d3.select(element[0]).append("svg:svg")
+                    .attr("width", eleW  )
+                    .attr("height", eleH )
+                    .on("click", function() {
+                        if (d3.event.target.nodeName != "svg" ) return;
+                        clearSelection();
+                    });
+
+                var vis = canvas.append("svg:g")
+                    .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+
+
+
+
 
                 function update(source) {
 
@@ -195,20 +222,17 @@ export default function($window) {
                     var duration = 300;
                     // Compute the new tree layout.
 
-                    var nodes = tree.nodes(scope.root).reverse();
+                    function getDepth(root) {
+                        if (!root.children) return 1;
+                        var depths = root.children.map(function (child) {
+                            return getDepth(child);
+                        });
+                        return Math.max(...depths) + 1;
+                    }
 
-                    // Normalize for fixed-depth.
-                    var deepest = 0,
-                        generationGutter = w;
-                    nodes.forEach(function (d) {
-                        if (deepest < d.depth) {
-                            deepest = d.depth;
-                        }
-                    });
-                    generationGutter = Math.floor(w / (deepest + 1));
-                    nodes.forEach(function (d) {
-                        d.y = d.depth * generationGutter;
-                    });
+                    var offset = w / getDepth(scope.root);
+
+                    var nodes = tree.size([h, w-offset]).nodes(scope.root).reverse();
 
                     // Update the nodes…
                     var node = vis.selectAll("g.node")

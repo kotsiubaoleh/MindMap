@@ -9,7 +9,8 @@
     "express": "^4.13.4",
     "mongodb": "^2.1.18",
     "mongoose": "^4.5.0",
-    "mongoose-materialized": "^0.1.8"
+    "mongoose-materialized": "^0.1.8",
+    "satellizer": "^0.14.1"
   },
   "devDependencies": {
     "gulp-babel": "^6.1.2",

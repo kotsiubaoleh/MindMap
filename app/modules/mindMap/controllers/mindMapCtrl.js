@@ -17,8 +17,7 @@ export default function ($scope, $http) {
     };
 
     $scope.delete = function (node, success, fail) {
-        console.log("DELETE");
-        $http.delete("data/" + node.id).then(function (response) {
+        $http.delete("data/" + node._id).then(function (response) {
             success()
             console.log("Delete success!");
         }, function (response) {
@@ -28,9 +27,7 @@ export default function ($scope, $http) {
     };
 
     $scope.insert = function(node, success, fail) {
-        console.log(node.parent._id);
         $http.put("data/", {name: node.name, parentId: node.parent._id}).then(function (response) {
-            console.log(response);
             success(response.data.id);
             console.log("Insert success!");
         }, function (response) {
