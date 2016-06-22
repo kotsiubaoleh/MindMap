@@ -8,7 +8,7 @@
 
     <div ng-controller="mindMapCtrl" class="minMapWrap">
         <mind-map class="mindMap" root="json" on-save="on-save(node, success, fail)"
-                  on-delete="on-delete(node, success, fail)" on-insert="on-insert(node, success, fail)" editable></mind-map>
+                  on-delete="on-delete(node, success, fail)" on-insert="on-insert(node, success, fail)" editable="false"></mind-map>
     </div>
 
     <div class="authentication-bg" ng-controller="authenticationCtrl" ng-if="isAuthenticated()">

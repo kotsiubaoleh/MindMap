@@ -5,16 +5,17 @@ export default function($window) {
         return {
             scope: {
                 root: "=",
+                editable: "=",
                 save: "&onSave",
                 delete: "&onDelete",
                 insert: "&onInsert"
             },
-            
+
             restrict: "E",
 
             templateUrl: "./app/views/mindMap.html",
 
-            link: function (scope, element, attrs) {
+            link: function (scope, element) {
 
                 //console.dir(scope.edit);
                 // scope.edit({edit:function () {
@@ -22,8 +23,6 @@ export default function($window) {
                 // }});
 
                 var selectedNode = {};
-                
-                var editable = "editable" in attrs;
 
                 var input = element.find("input");
 
@@ -78,6 +77,22 @@ export default function($window) {
                     });
                 }
 
+                function checkNode(d) {
+
+                    function check(d) {
+                        d.checked = true;
+                        if (d.parent) check(d.parent);
+                    }
+                    function uncheck(d) {
+                        d.checked = false;
+                        if (d.children) d.children.forEach(uncheck);
+                    }
+
+                    d.checked ? uncheck(d) : check(d);
+
+                    update(scope.root);
+                }
+
                 function clearSelection() {
                     deselectNode();
                     update(scope.root);
@@ -101,7 +116,7 @@ export default function($window) {
 
                         var textWidth = textNode.node().getBBox().width;
 
-                        if (!editable) {
+                        if (!scope.editable) {
                             var checkboxContainer = selectedElement.select("g.checkbox");
 
                             var checkboxWidth = checkboxContainer.select("rect").attr("width");
@@ -182,8 +197,6 @@ export default function($window) {
                     checkNodeName();
                 });
 
-
-
                 var eleW = element.prop("clientWidth"),
                     eleH = element.prop("clientHeight");
 
@@ -247,14 +260,13 @@ export default function($window) {
                             return "translate(" + source.y0 + "," + source.x0 + ")";
                         });
 
-                    if (editable) {
+                    if (scope.editable) {
                         nodeEnter.on("click", function (d) {
                             selectNode.call(this, d);
                         });
                     } else {
                         nodeEnter.on("click", function (d) {
-                            d.checked = !d.checked;
-                            d3.select(this).select("g.checkbox").classed("checked", d.checked);
+                            checkNode.call(this, d);
                         });
                     }
 
@@ -281,6 +293,11 @@ export default function($window) {
                             return d.name;
                         })
                         .style("fill-opacity", 1);
+
+                    nodeUpdate.select("g.checkbox")
+                        .attr("class", function (d) {
+                            return ("checkbox" + (d.checked ? " checked" : ""));
+                        });
 
                     // Transition exiting nodes to the parent's new position.
                     var nodeExit = node.exit()
@@ -366,9 +383,11 @@ export default function($window) {
 
 
 
-                    if (!editable) {
+                    if (!scope.editable) {
                         var checkbox = nodeEnter.append("svg:g")
-                            .attr("class", "checkbox");
+                            .attr("class", function (d) {
+                                return ("checkbox" + (d.checked ? " checked" : ""));
+                            });
 
                         checkbox.append("svg:rect")
                             .attr("width", 15)

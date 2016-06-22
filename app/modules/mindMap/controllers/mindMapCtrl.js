@@ -18,7 +18,7 @@ export default function ($scope, $http) {
 
     $scope.delete = function (node, success, fail) {
         $http.delete("data/" + node._id).then(function (response) {
-            success()
+            success();
             console.log("Delete success!");
         }, function (response) {
             fail();
