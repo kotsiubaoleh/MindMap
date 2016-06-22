@@ -1,13 +1,11 @@
 var router = require('express').Router();
 var node = require('../models/node');
 var async = require('async');
+var HttpError = require('../lib/HttpError');
 
 router.get('/', function(req, res, next) {
     req.models.node.GetFullArrayTree(function(err, root) {
-        if (err) {
-            next(err);
-            return;
-        }
+        if (err) return next(err);
         res.send(root[0]);
     })
 });
@@ -17,21 +15,14 @@ router.get('/', function(req, res, next) {
 router.put('/', function (req, res, next) {
     req.models.node.findOne({_id: req.body.parentId}, function (err, parentNode) {
         if (err) {
-            next(err);
-            return;
+            return next(err);
         } else if (!parentNode) {
-            var error = new Error("Node not find");
-            error.status = 404;
-            next(error);
-            return;
+            return next(new HttpError(404,"Node not find"));
         }
         var newNode = new req.models.node({name: req.body.name});
 
         parentNode.appendChild(newNode, function (err, node) {
-            if (err) {
-                next(err);
-                return;
-            }
+            if (err) return next(err);
             res.send({id: node._id});
         });
     })
@@ -59,11 +50,9 @@ router.post('/:id', function (req, res, next) {
     async.waterfall([
         function(callback) {
             req.models.node.findOne({_id: req.params.id}, function (err, node) {
-                if (err) callback(err);
-                else {
-                    node.name = req.body.name;
-                    callback(null, node);
-                }
+                if (err) return callback(err);
+                node.name = req.body.name;
+                callback(null, node);
             })
         },
         function (node, callback) {
@@ -123,7 +112,6 @@ router.delete('/:id', function (req, res, next) {
       function(idsToDelete, callback) {
           idsToDelete.push(req.params.id);
           req.models.node.remove({_id: {$in: idsToDelete}}, function (err, resp) {
-
                 if (err) callback(err);
                 else callback(null);
             })

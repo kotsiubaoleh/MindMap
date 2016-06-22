@@ -5,8 +5,10 @@
   "main": "api/server.js",
   "dependencies": {
     "async": "^2.0.0-rc.6",
+    "bcryptjs": "^2.3.0",
     "body-parser": "^1.15.1",
     "express": "^4.13.4",
+    "jwt-simple": "^0.5.0",
     "mongodb": "^2.1.18",
     "mongoose": "^4.5.0",
     "mongoose-materialized": "^0.1.8",

@@ -1,5 +1,6 @@
 var path = require('path');
 var bodyParser = require('body-parser');
+var HttpError = require('./lib/HttpError');
 
 var express = require('express');
 var app = express();
@@ -23,11 +24,14 @@ app.use('/app/views', express.static(path.join(__dirname, '../app/views')));
 app.use(bodyParser.json());
 
 app.use(function (req, res, next) {
-    req.models = {node: require('./models/node')};
+    req.models = {};
+    req.models.node = require('./models/node');
+    req.models.user = require('./models/user');
     next();
 });
 
-app.use("/data", require('./routes/data'));
+app.use('/auth',require('./routes/auth'));
+app.use('/data', require('./routes/data'));
 
 
 app.get('/', function(req, res, next) {
@@ -35,12 +39,18 @@ app.get('/', function(req, res, next) {
 });
 
 app.use(function(err, req, res, next) {
-    console.log("Error: " + err);
+    if (err instanceof HttpError) {
+        res.send(err.status, err.message);
+        return;
+    }
+
+    console.log('Error: ' + err);
+    console.log(err.stack);
     res.send(err.status);
 });
 
 app.listen(3000, function () {
-    console.log("Server started!");
+    console.log('Server started!');
 });
 
 

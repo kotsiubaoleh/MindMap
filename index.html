@@ -11,25 +11,25 @@
                   on-delete="on-delete(node, success, fail)" on-insert="on-insert(node, success, fail)" editable></mind-map>
     </div>
 
-    <div class="authentication-bg">
-        <div class="login" ng-controller="authenticationCtrl">
+    <div class="authentication-bg" ng-controller="authenticationCtrl" ng-if="isAuthenticated()">
+        <div class="login" >
             <form>
                 <div class="form-group">
                     <label for="exampleInputEmail1">Login</label>
                     <input type="text" class="form-control" id="exampleInputEmail1" placeholder="Login" ng-model="loginName">
                 </div>
                 <div class="form-group">
-                    <label for="exampleInputPassword1">Password</label>
-                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" ng-model="password">
+                    <label>Password</label>
+                    <input type="password" class="form-control" placeholder="Password" ng-model="password">
                 </div>
                 <div class="form-group" ng-show="newUser">
-                    <label for="exampleInputPassword1">Repeat password</label>
-                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" ng-model="passwordRep">
+                    <label>Repeat password</label>
+                    <input type="password" class="form-control" placeholder="Password" ng-model="passwordRep">
                 </div>
                 <div class="checkbox">
                     <label><input type="checkbox" ng-model="newUser"/>New user</label>
                 </div>
-                <input type="submit" class="submitButton"  ng-value="newUser ? 'Register' : 'Login'" ng-click="login()"/>
+                <input type="submit" class="submitButton"  ng-value="newUser ? 'Register' : 'Login'" ng-click="newUser ? signup() : login() "/>
             </form>
         </div>
     </div>

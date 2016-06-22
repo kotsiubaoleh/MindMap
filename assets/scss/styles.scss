@@ -1,4 +1,15 @@
-body {
+
+input[type="checkbox"] {
+  margin: 10px
+}
+
+.submitButton {
+  display: block;
+  height: 40px;
+  width: 100%;
+  font-size: 1.2em;
+  background-color: #0074d9;
+  color: white;
 }
 
 .authentication-bg {
@@ -14,12 +25,14 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     padding: 20px;
-    border-radius: 10px;
+    box-shadow: 0 0 5px;
     background-color: snow;
     display: block;
     margin: auto;
     width: 400px;
   }
+
+
 }
 
 .minMapWrap {
@@ -118,19 +131,6 @@ body {
   }
 }
 
-input[type="checkbox"] {
-  margin: 10px
-}
-
-.submitButton {
-  display: block;
-  height: 40px;
-  width: 100%;
-  font-size: 1.2em;
-  background-color: #0074d9;
-  border-radius: 5px;
-  color: white;
-}
 
 
 
