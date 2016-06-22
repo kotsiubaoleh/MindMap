@@ -222,6 +222,7 @@ export default function($window) {
                 var vis = canvas.append("svg:g")
                     .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
+                
 
 
 
